@@ -25,3 +25,5 @@ runs:
         stdout="$(terraform --help)"
         echo "::set-output name=stdout::${stdout}"
       shell: bash
+    - id: terraform-recursive
+      uses: abatilo/terraform-composite-action@master

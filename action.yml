@@ -1,5 +1,10 @@
 name: 'Get TF version.'
 description: 'Get the version of TF that is installed'
+inputs:
+  who-to-greet:  # id of input
+    description: 'Who to greet'
+    required: true
+    default: 'World'
 outputs:
   stdout: 
     description: "Output number"

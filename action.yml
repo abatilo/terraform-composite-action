@@ -1,0 +1,15 @@
+name: 'Get TF version'
+description: 'Get the version of TF that's installed'
+inputs:
+outputs:
+  stdout: 
+    description: "Output number"
+    value: ${{ steps.terraform-version.outputs.stdout }}
+runs:
+  using: "composite"
+  steps: 
+    - id: terraform-version
+      run: |
+        stdout="$(terraform --version)"
+        echo "::set-output name=stdout::${stdout}"
+      shell: bash

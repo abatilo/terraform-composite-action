@@ -43,8 +43,7 @@ function terraformPlan {
   fi
 
   # Comment on the pull request if necessary.
-  if [ "$GITHUB_EVENT_NAME" == "pull_request" ] && [ "${tfComment}" == "1" ] && ([ "${planHasChanges}" == "true" ] || [ "${planCommentStatus}" == "Failed" ]); then
-    planCommentWrapper="#### \`terraform plan\` ${planCommentStatus}
+  planCommentWrapper="#### \`terraform plan\` ${planCommentStatus}
 <details><summary>Show Output</summary>
 \`\`\`
 ${planOutput}
@@ -52,13 +51,12 @@ ${planOutput}
 </details>
 *Workflow: \`${GITHUB_WORKFLOW}\`, Action: \`${GITHUB_ACTION}\`, Working Directory: \`${tfWorkingDir}\`, Workspace: \`${tfWorkspace}\`*"
 
-    planCommentWrapper=$(stripColors "${planCommentWrapper}")
-    echo "plan: info: creating JSON"
-    planPayload=$(echo "${planCommentWrapper}" | jq -R --slurp '{body: .}')
-    planCommentsURL=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
-    echo "plan: info: commenting on the pull request"
-    echo "${planPayload}" | curl -s -S -H "Authorization: token ${GITHUB_TOKEN}" --header "Content-Type: application/json" --data @- "${planCommentsURL}" > /dev/null
-  fi
+  planCommentWrapper=$(stripColors "${planCommentWrapper}")
+  echo "plan: info: creating JSON"
+  planPayload=$(echo "${planCommentWrapper}" | jq -R --slurp '{body: .}')
+  planCommentsURL=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
+  echo "plan: info: commenting on the pull request"
+  echo "${planPayload}" | curl -s -S -H "Authorization: token ${GITHUB_TOKEN}" --header "Content-Type: application/json" --data @- "${planCommentsURL}" > /dev/null
 
   echo ::set-output name=has_output::${planHasChanges}
 

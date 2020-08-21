@@ -60,7 +60,7 @@ ${planOutput}
     echo "${planPayload}" | curl -s -S -H "Authorization: token ${GITHUB_TOKEN}" --header "Content-Type: application/json" --data @- "${planCommentsURL}" > /dev/null
   fi
 
-  echo ::set-output name=has_changes::${planHasChanges}
+  echo ::set-output name=has_output::${planHasChanges}
 
   # https://github.community/t5/GitHub-Actions/set-output-Truncates-Multiline-Strings/m-p/38372/highlight/true#M3322
   planOutput="${planOutput//'%'/'%25'}"

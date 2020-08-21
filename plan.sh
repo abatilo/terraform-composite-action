@@ -1,5 +1,9 @@
 #!/bin/bash
 
+function stripColors {
+  echo "${1}" | sed 's/\x1b\[[0-9;]*m//g'
+}
+
 function terraformPlan {
   # Gather the output of `terraform plan`.
   echo "plan: info: planning Terraform configuration in ${tfWorkingDir}"

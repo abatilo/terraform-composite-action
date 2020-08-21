@@ -1,5 +1,5 @@
 name: 'Get TF version.'
-description: 'Get the version of TF that's installed'
+description: 'Get the version of TF that is installed'
 inputs:
 outputs:
   stdout: 

@@ -70,3 +70,5 @@ ${planOutput}
   echo "::set-output name=output::${planOutput}"
   exit ${planExitCode}
 }
+
+terraformPlan

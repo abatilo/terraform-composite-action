@@ -1,29 +1,59 @@
-name: 'Get TF version.'
-description: 'Get the version of TF that is installed'
-inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
+name: 'Terraform Plan'
+description: 'Preview your terraform plan'
+inputs: {}
 outputs:
   stdout:
-    description: "Output number"
-    value: ${{ steps.terraform-version.outputs.stdout }}
-  help:
-    description: "Output number"
-    value: ${{ steps.terraform-help.outputs.stdout }}
+    description: "terraform plan stdout"
+    value: ${{ steps.plan.outputs.stdout }}
+  exitcode:
+    description: "terraform plan exitcode"
+    value: ${{ steps.plan.outputs.exitcode }}
 runs:
   using: "composite"
   steps: 
-    - id: terraform-version
+    - name: Terraform Plan
+      id: plan
+      working-directory: terraform/${{ matrix.dir }}
+      # Follows tips from:
+      # https://github.community/t/set-output-truncates-multiline-strings/16852/5
       run: |
-        stdout="$(terraform --version)"
-        echo "::set-output name=stdout::${stdout}"
-      shell: bash
-    - id: terraform-help
+        # Disables the immediate action failure due to exit code 2 on changes detected
+        set +e
+        plan_stdout="$(terraform plan -no-color -detailed-exitcode)"
+        plan_exitcode="$?"
+        plan_stdout="${plan_stdout//'%'/'%25'}"
+        plan_stdout="${plan_stdout//$'\n'/'%0A'}"
+        plan_stdout="${plan_stdout//$'\r'/'%0D'}"
+
+        echo "::set-output name=stdout::${plan_stdout}"
+        echo "::set-output name=exitcode::${plan_exitcode}"
+    - name: Comment on PR
+      uses: actions/github-script@0.9.0
+      # exitcode 2 means changes were found
+      if: ${{ github.event_name == 'pull_request' && steps.plan.outputs.exitcode == 2 }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### \`${{ matrix.dir }}\`
+
+          <details><summary>Show plan</summary>
+
+          \`\`\`
+          ${{ steps.plan.outputs.stdout }}
+          \`\`\`
+
+          </details>
+
+          `;
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+    - name: Fail action if there's an error
+      if: ${{ steps.plan.outputs.exitcode == 1 }}
       run: |
-        stdout="$(terraform --help)"
-        echo "::set-output name=stdout::${stdout}"
-      shell: bash
-    - id: terraform-recursive
-      uses: abatilo/terraform-composite-action@master
+        echo "Terraform plan returned ${{ steps.plan.outputs.exitcode }}"
+        exit ${{ steps.plan.outputs.exitcode }}

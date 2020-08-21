@@ -15,4 +15,4 @@ runs:
       shell: bash
       id: plan
       working-directory: terraform/${{ matrix.dir }}
-      run: ${{ github.action_path }}/diff.sh
+      run: ${{ github.action_path }}/plan.sh

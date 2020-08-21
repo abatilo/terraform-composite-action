@@ -1,4 +1,4 @@
-name: 'Get TF version'
+name: 'Get TF version.'
 description: 'Get the version of TF that's installed'
 inputs:
 outputs:

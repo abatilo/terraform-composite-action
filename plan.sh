@@ -49,10 +49,12 @@ function terraformPlan {
   # Comment on the pull request if necessary.
   planCommentWrapper="#### \`terraform plan\` ${planCommentStatus}
 <details><summary>Show Output</summary>
+
 \`\`\`
 ${planOutput}
 \`\`\`
 </details>
+
 *Workflow: \`${GITHUB_WORKFLOW}\`, Action: \`${GITHUB_ACTION}\`, Working Directory: \`${tfWorkingDir}\`, Workspace: \`${tfWorkspace}\`*"
 
   planCommentWrapper=$(stripColors "${planCommentWrapper}")
